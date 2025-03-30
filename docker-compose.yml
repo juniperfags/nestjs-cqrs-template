@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    container_name: mongo-server
+    volumes:
+      - ./data:/data/db #Custom volume path for data storage, remove it if you don't need it
+    ports:
+      - ${MONGO_INITDB_LISTEN_PORT}:27017
+    expose:
+      - ${MONGO_INITDB_LISTEN_PORT}
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cqrs-nestjs-boilerplate
+    environment:
+      - APP_PORT=${APP_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_RETRY_ATTEMPTS=${MONGO_RETRY_ATTEMPTS}
+      - MONGO_RETRY_DELAY=${MONGO_RETRY_DELAY}
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    expose:
+      - ${APP_PORT}
+    depends_on:
+      - mongo

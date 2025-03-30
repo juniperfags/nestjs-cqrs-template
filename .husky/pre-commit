@@ -1,0 +1,55 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Collecting staged files..."
+STAGED_FILES=$(git diff --cached --name-only)
+
+# 1. Prettier formatting
+echo "🎨 Formatting staged files with Prettier..."
+echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty npx prettier --write
+
+# Re-add formatted files
+echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty git add
+
+# 2. ESLint linting
+echo "🧹 Running ESLint on staged code..."
+echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx)$' | xargs --no-run-if-empty npx eslint
+if [ $? -ne 0 ]; then
+  echo "❌ Linting failed. Fix issues before committing."
+  exit 1
+fi
+
+# 3. Check if test files are staged
+TEST_FILES=$(echo "$STAGED_FILES" | grep -E '\.(test|spec)\.(js|ts)$')
+
+if [ -n "$TEST_FILES" ]; then
+  echo "🧪 Test files changed — running full test suite with coverage..."
+
+  # Run tests with coverage
+  npx jest --coverage --coverageReporters=text-summary > coverage-summary.txt
+
+  # Extract global coverage %
+  COVERAGE=$(grep "All files" coverage-summary.txt | awk '{print $3}' | sed 's/%//')
+
+  if [ -z "$COVERAGE" ]; then
+    echo "❌ Could not parse coverage. Did the tests run correctly?"
+    rm coverage-summary.txt
+    exit 1
+  fi
+
+  # Check coverage threshold
+  THRESHOLD=75
+  COVERAGE_INT=${COVERAGE%.*}
+  if [ "$COVERAGE_INT" -lt "$THRESHOLD" ]; then
+    echo "❌ Test coverage too low: ${COVERAGE}% (minimum is ${THRESHOLD}%)"
+    rm coverage-summary.txt
+    exit 1
+  else
+    echo "✅ Test coverage passed: ${COVERAGE}%"
+    rm coverage-summary.txt
+  fi
+else
+  echo "✅ No test files staged — skipping test run."
+fi
+
+echo "✅ All pre-commit checks passed!"
