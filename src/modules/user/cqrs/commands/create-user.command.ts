@@ -1,3 +1,5 @@
+import { UserAggregate } from '../aggregates/user.aggregate';
+
 export interface ICreateUser {
   username: string;
   email: string;
