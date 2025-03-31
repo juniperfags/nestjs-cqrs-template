@@ -1,19 +1,17 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo "🔍 Collecting staged files..."
 STAGED_FILES=$(git diff --cached --name-only)
 
 # 1. Prettier formatting
 echo "🎨 Formatting staged files with Prettier..."
-echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty npx prettier --write
+echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty npx prettier -w
 
 # Re-add formatted files
 echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty git add
 
 # 2. ESLint linting
 echo "🧹 Running ESLint on staged code..."
-echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx)$' | xargs --no-run-if-empty npx eslint
+echo "$STAGED_FILES"
+echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx)$' | xargs --no-run-if-empty npx eslint --
 if [ $? -ne 0 ]; then
   echo "❌ Linting failed. Fix issues before committing."
   exit 1

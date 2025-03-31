@@ -7,5 +7,5 @@ export interface ICreateUser {
 }
 
 export class CreateUserCommand {
-  constructor(public readonly user: ICreateUser) { }
+  constructor(public readonly user: ICreateUser) {}
 }
