@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import {
   IsNotEmpty,
