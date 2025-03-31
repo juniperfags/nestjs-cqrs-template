@@ -12,14 +12,6 @@ echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run
 echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx|json|css|md)$' | xargs --no-run-if-empty git add
 
 # 2. ESLint linting
-# echo "🧹 Running ESLint on staged code..."
-# echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx)$' | xargs --no-run-if-empty npx eslint --
-# if [ $? -ne 0 ]; then
-#   echo "❌ Linting failed. Fix issues before committing."
-#   exit 1
-# fi
-
-# 2. ESLint linting
 echo "🧹 Running ESLint on staged code..."
 CODE_FILES=$(echo "$STAGED_FILES" | grep -E '\.(js|ts|jsx|tsx)$' | tr '\n' ' ')
 
