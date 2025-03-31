@@ -29,7 +29,7 @@ if [ -n "$CODE_FILES" ]; then
   echo ""
 
   # Run eslint and capture exit code to prevent immediate script exit
-  npx eslint -- $CODE_FILES
+  npx eslint --max-warnings=0 -- $CODE_FILES
   ESLINT_EXIT_CODE=$?
 
   if [ $ESLINT_EXIT_CODE -ne 0 ]; then
